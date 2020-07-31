@@ -8,7 +8,7 @@
 
 <h3 align="center">
   <img src="https://img.shields.io/badge/-html-e34f26?logo=html5&logoColor=fff" alt="html badge" />
-  <img src="https://img.shields.io/badge/-css-1572b6?logo=css3&logoColor=fff" alt="css badge" />
+  <img src="https://img.shields.io/badge/-sass-cc6699?logo=sass&logoColor=fff" alt="sass badge" />
 </h3>
 
 ## About
@@ -21,6 +21,12 @@ The original style guide can be viewed in the [`resources`](./resources) folder 
 
 The HTML and CSS code must pass W3C validation.
 
+## Installation
+
+```bash
+git clone https://github.com/adamelliotfields/treehouse-style-guide.git
+```
+
 ## Usage
 
 You can view hosted site [here](https://adamelliotfields.github.io/treehouse-style-guide/index.html).
@@ -29,8 +35,8 @@ You can also simply open `index.html` in your browser directly. For example, if 
 is `adam` and you cloned the repo in `~/Downloads`, then go to
 `file:///Users/adam/Downloads/treehouse-style-guide/index.html` in your web browser.
 
-You can also use PHP or Python's built-in HTTP server by running one of these commands in the same
-directory as `index.html`.
+Finally, you can also use PHP or Python's built-in HTTP server by running one of these commands in
+the same directory as `index.html`.
 
 ```bash
 # PHP
@@ -45,10 +51,58 @@ python3 -m http.server
 
 ## Local Development
 
-The build pipeline consists of Gulp and Dart Sass with Browser Sync providing the local development
-server and live reloading. You can view the Gulpfile [here](./Gulpfile.js).
+> _Note, if you're grading the project then you **do not** have to install or compile anything._
 
-Note that you must have Node.js v12.10.0 or later installed (v12.10 was release in September 2019,
+### Installing Sass
+
+I recommend [Scout](https://scout-app.io) if you are not comfortable with the command line. It is
+free, open-source, and cross-platform.
+
+#### macOS
+
+```bash
+brew tap sass/sass
+
+brew install sass/sass/sass
+```
+
+#### Windows
+
+```bash
+choco install sass
+```
+
+#### Linux
+
+```bash
+wget -qO /tmp/dart-sass.tar.gz https://github.com/sass/dart-sass/releases/download/1.26.10/dart-sass-1.26.10-linux-x64.tar.gz
+
+tar -C /tmp -xzf /tmp/dart-sass.tar.gz
+
+sudo mv /tmp/dart-sass/sass /usr/local/bin
+
+sudo chmod +x /usr/local/bin/sass
+
+rm -rf /tmp/dart-sass /tmp/dart-sass.tar.gz
+```
+
+### Compiling SCSS to CSS
+
+```bash
+sass scss/styles.scss css/styles.css
+
+# or
+
+sass --watch scss/style.scss css/styles.css
+```
+
+### Live Reloading
+
+For live reloading with [Browser Sync](https://browsersync.io), we only want to update the page when
+the compiled CSS changes, not when a SCSS or sourcemap file changes. The best way to do this is to
+run Browser Sync in a Gulp pipeline. You can view the Gulpfile [here](./Gulpfile.js).
+
+Note that you must have Node.js v12.10.0 or later installed (v12.10 was released in September 2019,
 so you should be good).
 
 ```bash
