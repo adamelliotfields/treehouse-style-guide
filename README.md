@@ -16,7 +16,7 @@
 The fourth unit demonstrates using Sass variables, mixins, and nesting to recreate a "style guide"
 from CSS. All styles must be modular and only a single `styles.css` file should be emitted.
 
-The original style guide can be viewed in the [./resources] folder and the live demo can been seen
+The original style guide can be viewed in the [`resources`](./resources) folder and the live demo can been seen
 [here](https://adamelliotfields.github.io/treehouse-style-guide/resources/index.html).
 
 The HTML and CSS code must pass W3C validation.
@@ -48,7 +48,8 @@ python3 -m http.server
 The build pipeline consists of Gulp and Dart Sass with Browser Sync providing the local development
 server and live reloading. You can view the Gulpfile [here](./Gulpfile.js).
 
-Note that you must have Node.js v12.10.0 or later installed.
+Note that you must have Node.js v12.10.0 or later installed (v12.10 was release in September 2019,
+so you should be good).
 
 ```bash
 npm install
