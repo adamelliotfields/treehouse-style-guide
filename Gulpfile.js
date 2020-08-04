@@ -6,6 +6,8 @@ const gulpSass = require('gulp-sass');
 const { create } = require('browser-sync');
 const { dest, parallel, series, src, watch } = require('gulp');
 
+gulpSass.compiler = require('sass');
+
 // Instantiate the Browser Sync instance.
 const bs = create();
 
@@ -20,22 +22,24 @@ const clean = async () => {
 // Clones the `master` branch into the `dist` folder.
 const worktree = () => execa('git', ['worktree', 'add', '-B', 'master', 'dist', 'origin/master']);
 
-// TODO: Copy scss folder as well.
 // Copy static assets.
 // prettier-ignore
 const copy = () => src('src/static/**/*')
   .pipe(gulpIf('**/gitignore', gulpRename('.gitignore')))
   .pipe(dest('dist'));
 
+// Copy Sass files.
+const copySass = () => src('src/scss/**/*.scss', { base: 'scss' }).pipe(dest('dist'));
+
 // Copy HTML.
 // prettier-ignore
-const html = () => src('src/**/*.html').pipe(dest('dist'));
+const html = () => src('src/**/*.html', { ignore: '**/resources/**/*.html' }).pipe(dest('dist'));
 
 // Compile SCSS to CSS.
 // prettier-ignore
-const sass = () => src('src/scss/styles.scss')
+const sass = () => src('src/scss/styles.scss', { sourcemaps: true })
   .pipe(gulpSass({ outputStyle: 'expanded' }).on('error', gulpSass.logError))
-  .pipe(dest('dist/css'));
+  .pipe(dest('dist/css', { sourcemaps: '.' }));
 
 // Stream the compiled CSS to Browser Sync.
 const reloadSass = () => sass().pipe(bs.stream({ match: '**/*.css' }));
@@ -63,6 +67,7 @@ exports.default = series(
   clean,
   worktree,
   copy,
+  copySass,
   html,
   sass,
   browserSync,
@@ -74,6 +79,7 @@ exports.build = series(
   clean,
   worktree,
   copy,
+  copySass,
   html,
   sass,
 );
