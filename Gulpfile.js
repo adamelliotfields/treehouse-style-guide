@@ -1,49 +1,79 @@
-const fs = require('fs');
+const execa = require('execa');
+const fs = require('fs-extra');
+const gulpIf = require('gulp-if');
+const gulpRename = require('gulp-rename');
 const gulpSass = require('gulp-sass');
-const path = require('path');
 const { create } = require('browser-sync');
 const { dest, parallel, series, src, watch } = require('gulp');
-
-// Use Dart Sass.
-gulpSass.compiler = require('sass');
 
 // Instantiate the Browser Sync instance.
 const bs = create();
 
-// Delete the `css` folder.
-const clean = (done) => {
-  const cssPath = path.join(__dirname, 'css');
-  if (fs.existsSync(cssPath)) {
-    // The recursive option only works in Node 12.10.0 and up.
-    return fs.rmdir(cssPath, { recursive: true }, (err) => (err === null ? done() : done(err)));
-  }
-  return done();
+// Delete the `dist` folder and remove it from the worktree.
+const clean = async () => {
+  await fs.remove('./dist');
+
+  // This always exits cleanly, even if there are no worktrees to prune.
+  return execa('git', ['worktree', 'prune']);
 };
 
-// Compile SCSS to CSS including sourcemaps.
+// Clones the `master` branch into the `dist` folder.
+const worktree = () => execa('git', ['worktree', 'add', '-B', 'master', 'dist', 'origin/master']);
+
+// TODO: Copy scss folder as well.
+// Copy static assets.
 // prettier-ignore
-const compile = () => src('scss/styles.scss', { sourcemaps: true })
-  .pipe(gulpSass().on('error', gulpSass.logError))
-  .pipe(dest('css', { sourcemaps: '.' }));
+const copy = () => src('src/static/**/*')
+  .pipe(gulpIf('**/gitignore', gulpRename('.gitignore')))
+  .pipe(dest('dist'));
+
+// Copy HTML.
+// prettier-ignore
+const html = () => src('src/**/*.html').pipe(dest('dist'));
+
+// Compile SCSS to CSS.
+// prettier-ignore
+const sass = () => src('src/scss/styles.scss')
+  .pipe(gulpSass({ outputStyle: 'expanded' }).on('error', gulpSass.logError))
+  .pipe(dest('dist/css'));
 
 // Stream the compiled CSS to Browser Sync.
-const stream = () => compile().pipe(bs.stream({ match: '**/*.css' }));
+const reloadSass = () => sass().pipe(bs.stream({ match: '**/*.css' }));
+
+// Stream the compiled HTML to Browser Sync.
+const reloadHtml = () => html().pipe(bs.stream({ match: '**/*.html', once: true }));
 
 // Watch all SCSS files for changes and let Browser Sync inject changes into the page.
-const watchScss = () => watch('scss/**/*.scss', stream);
+const watchSass = () => watch('src/scss/**/*.scss', reloadSass);
 
-// Watch all HTML files for changes and let Browser Sync reload the page.
-const watchHtml = () => watch('**/*.html').on('change', bs.reload);
+// Watch all Pug files for changes and let Browser Sync reload the page.
+const watchHtml = () => watch('src/**/*.html', reloadHtml);
 
 // Start the Browser Sync server.
 // prettier-ignore
 const browserSync = (done) => bs.init({
-  // Shorthand for serving all files in the current working directory.
-  server: true,
+  server: 'dist',
   callbacks: {
     ready: (err) => (err === null ? done() : done(err)),
   },
 });
 
-exports.default = series(clean, compile, browserSync, parallel(watchScss, watchHtml));
-exports.build = series(clean, compile);
+// prettier-ignore
+exports.default = series(
+  clean,
+  worktree,
+  copy,
+  html,
+  sass,
+  browserSync,
+  parallel(watchHtml, watchSass),
+);
+
+// prettier-ignore
+exports.build = series(
+  clean,
+  worktree,
+  copy,
+  html,
+  sass,
+);
