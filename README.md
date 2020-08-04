@@ -16,15 +16,15 @@
 The fourth unit demonstrates using Sass variables, mixins, and nesting to recreate a "style guide"
 from CSS. All styles must be modular and only a single `styles.css` file should be emitted.
 
-The original style guide can be viewed in the [`resources`](./resources) folder and the live demo can been seen
-[here](https://adamelliotfields.github.io/treehouse-style-guide/resources/index.html).
+The original style guide can be viewed in the [`resources`](./resources) folder and the live demo
+can been seen [here](https://adamelliotfields.github.io/treehouse-style-guide/resources/index.html).
 
 The HTML and CSS code must pass W3C validation.
 
 ## Installation
 
 ```bash
-git clone https://github.com/adamelliotfields/treehouse-style-guide.git
+git clone --single-branch -b master https://github.com/adamelliotfields/treehouse-style-guide.git
 ```
 
 ## Usage
@@ -49,11 +49,9 @@ python -m SimpleHTTPServer
 python3 -m http.server
 ```
 
-## Local Development
+## Sass
 
-> _Note, if you're grading the project then you **do not** have to install or compile anything._
-
-### Installing Sass
+### Installation
 
 I recommend [Scout](https://scout-app.io) if you are not comfortable with the command line. It is
 free, open-source, and cross-platform.
@@ -94,25 +92,6 @@ sass scss/styles.scss css/styles.css
 # or
 
 sass --watch scss/style.scss css/styles.css
-```
-
-### Live Reloading
-
-For live reloading with [Browser Sync](https://browsersync.io), we only want to update the page when
-the compiled CSS changes, not when a SCSS or sourcemap file changes. The best way to do this is to
-run Browser Sync in a Gulp pipeline. You can view the Gulpfile [here](./Gulpfile.js).
-
-Note that you must have Node.js v12.10.0 or later installed (v12.10 was released in September 2019,
-so you should be good).
-
-```bash
-npm install
-
-# Start the local development server.
-npm start
-
-# Compile Sass to CSS without starting the server.
-npm run build
 ```
 
 ## Validating HTML and CSS
